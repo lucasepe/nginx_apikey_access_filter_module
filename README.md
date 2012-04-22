@@ -33,3 +33,13 @@ Synopsis
 Description
 ===========
 
+This module could be useful to anyone who develops backends APIs wich are consumed by Javascript, iOS, Android and other client apps.
+
+Rather then implements access controls for each backend, you can enble this filter at the relative location in your nginx configuration file.
+
+Every time a client app call one of yours backend API, it has to pass a token:
+
+   CLIENT_ID|ISUSSED_TIME|HAMAC_SHA1( client_id|request_uri, CLIENT_SECRET)
+
+
+
