@@ -64,8 +64,8 @@ Actually the module needs a MySQL database as client id / client secret provider
 Install
 =======
  
- * Download the latest version of this module HERE(https://github.com/Lus71/nginx_apikey_access_filter_module/zipball/master).
- * Download the latest version of Nginx HERE(http://nginx.org/)
+ * Download the latest version of this module [HERE](https://github.com/Lus71/nginx_apikey_access_filter_module/zipball/master).
+ * Download the latest version of Nginx [HERE](http://nginx.org/)
 
 Build the source with this module:
 
@@ -95,5 +95,10 @@ Create the MySQL database holding the client_id / client_secret pairs:
       `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+Insert some values; for example:
+
+    INSERT INTO API_USER (id, secret) VALUES ('LUCACLIENTID1971', 'MyCl13n7S3Cr377001233aaER');
+
 
 
