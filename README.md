@@ -37,9 +37,9 @@ This module could be useful to anyone who develops backends APIs wich are consum
 
 Rather then implements access controls for each backend, you can enble this filter at the relative location in your nginx configuration file.
 
-Every time a client app call one of yours backend API, it has to pass a token:
+Every time a client app call one of yours backend API, it has to pass a token (named `X-AuthAPI`):
 
-   CLIENT_ID|ISUSSED_TIME|HAMAC_SHA1( client_id|request_uri, CLIENT_SECRET)
+    client_id|iussed_time|HAMAC_SHA1(client_id|request_uri_path, client_secret)
 
 
 
