@@ -12,7 +12,6 @@ Synopsis
 ========
 
    server {
-      
       ...
 
       # let's filter all the requests to our backend API s(i.e. a tornado web app)
@@ -35,3 +34,7 @@ Synopsis
 
       ...
    }
+
+Description
+===========
+
