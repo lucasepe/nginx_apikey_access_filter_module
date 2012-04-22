@@ -59,7 +59,7 @@ Here the http request using wget:
 
 If the token is invalid (tampered, expired etc.) this module will repond with an ERROR 403: Forbidden otherwise the request will be passed to the desired url.
 
-Actually the module needs a MySQL database as client id / client secret provider, but I'd like to use [Redis(http://redis.io/)]. Redis is asynchronous while opening and closing the MySQL connection is a blocking operation. If someone would like to help me..That's will be cool! :-)
+Actually the module needs a MySQL database as client id / client secret provider, but I'd like to use [Redis](http://redis.io/). Redis is asynchronous while opening and closing the MySQL connection is a blocking operation. If someone would like to help me..That's will be cool! :-)
 
 
 
