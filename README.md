@@ -33,9 +33,9 @@ Synopsis
 Description
 ===========
 
-This module could be useful to anyone who develops backends APIs wich are consumed by Javascript, iOS, Android and other client apps.Rather then implements access controls for each backend, you can enble this filter at the relative location in your nginx configuration file.
+This module could be useful to anyone who develops backends APIs wich are consumed by Javascript, iOS, Android and other client apps. Rather then implements access controls for each backend, you can enble this filter at the relative location in your nginx configuration file.
 
-Every time a client app call one of yours backend API, it has to pass a token (named `X-AuthAPI`):
+Every time a client app call one of yours backend API, has to pass a token (named `X-AuthAPI`):
 
     client_id|issued_time|HAMAC_SHA1(client_id|request_uri_path, client_secret)
 
@@ -57,6 +57,11 @@ Here the http request using wget:
      wget --header="X-AuthAPI:LUCACLIENTID1971|1335104889|f0679855e23b2c338a41491c0b8e0576cc8397dd" \
          -O - "http://your.cool.domain.com/get_all_photos.do?q=cat&max_results=40"
 
-If the token is invalid (tampered, expired etc.) this module will repond with an ERROR 403: Forbidden
+If the token is invalid (tampered, expired etc.) this module will repond with an ERROR 403: Forbidden otherwise the request will be passed to the desired url.
+
+Actually the module needs a MySQL database as client id / client secret provider, but I'd like to use [Redis[http://redis.io/]]. Redis is asynchronous while opening and closing the MySQL connection is a blocking operation. If someone would like to help me..That's will be cool! :-)
+
+
+
 
 
