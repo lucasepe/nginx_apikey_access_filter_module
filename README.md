@@ -61,7 +61,39 @@ If the token is invalid (tampered, expired etc.) this module will repond with an
 
 Actually the module needs a MySQL database as client id / client secret provider, but I'd like to use [Redis](http://redis.io/). Redis is asynchronous while opening and closing the MySQL connection is a blocking operation. If someone would like to help me..That's will be cool! :-)
 
+Install
+=======
+ 
+ * Download the latest version of this module HERE(https://github.com/Lus71/nginx_apikey_access_filter_module/zipball/master).
+ * Download the latest version of Nginx HERE(http://nginx.org/)
 
+Build the source with this module:
 
+    wget 'http://nginx.org/download/nginx-1.0.15.tar.gz'
+    tar -xzvf nginx-1.0.15.tar.gz
+    cd nginx-1.0.15/
+
+    # Here we assume Nginx is to be installed under /opt/nginx/.
+    ./configure --prefix=/opt/nginx \
+        --add-module=/path/to/nginx_apikey_access_filter_module
+
+    make
+
+    make install
+
+Create the MySQL database holding the client_id / client_secret pairs:
+
+    CREATE DATABASE IF NOT EXISTS APIKEYS DEFAULT CHARACTER SET utf8;
+    GRANT CREATE,INSERT,DELETE,UPDATE,SELECT on APIKEYS.* to apikeyadmin@localhost IDENTIFIED BY 'apikeyadmin';
+
+    DROP TABLE IF EXISTS `API_USER`;
+
+    CREATE TABLE `API_USER` (
+      `id` varchar(40) NOT NULL ,
+      `secret` varchar(80) NOT NULL,
+      `active` tinyint(3) unsigned NOT NULL DEFAULT '1',
+      `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
