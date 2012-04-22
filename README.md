@@ -100,5 +100,13 @@ Insert some values; for example:
 
     INSERT INTO API_USER (id, secret) VALUES ('LUCACLIENTID1971', 'MyCl13n7S3Cr377001233aaER');
 
+Add the directives to your location in your nginx configuration file (see Synopsis).
+
+TODO
+====
+
+ * Adding an `expire time` directive (so the API token will have an expiration time)
+
+ * Replacing MySQL with Redis
 
 
