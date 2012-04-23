@@ -20,16 +20,6 @@
 
 
 
-#define NGX_APIKEY_CLIENT_ID_NOT_FOUND		-1
-#define NGX_APIKEY_INVALID_CLIENT_SECRET	-2
-#define NGX_APIKEY_REQUEST_EXPIRED			-3
-#define NGX_APIKEY_INVALID_DIGEST			-4
-
-
-#define SQL_APIKEY_ACCESS_FILTER_CHECK_ACTIVE \
-	"SELECT client_id FROM API_CLIENT WHERE active = 1 AND id = '%s'"
-
-
 /*
  * Callback for installing this filter (post-configuration step)
  */
