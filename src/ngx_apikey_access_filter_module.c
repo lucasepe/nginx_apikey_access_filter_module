@@ -80,7 +80,11 @@ ngx_apikey_verify( ngx_http_request_t *r, ngx_str_t *client_id, ngx_str_t *expir
 static ngx_int_t
 ngx_apikey_mysql_fetch_client_secret( ngx_http_request_t *r, MYSQL *con, ngx_str_t *client_id, ngx_str_t *client_secret );
 
-
+/*
+ * Create the expire_time string as unix epoch adding the specified minutes.
+ */
+static ngx_int_t
+ngx_apikey_token_expire_time( ngx_pool_t *pool, size_t minutes_to_add, ngx_str_t *expire_time );
 
 
 /* Module's directives  */
@@ -459,12 +463,6 @@ ngx_apikey_set_dburl (ngx_conf_t * cf, ngx_command_t * cmd, void *conf) {
 	return NGX_CONF_OK;
 }
 
-
-
-#define NGX_APIKEY_INVALID_CLIENT_SECRET	-2
-#define NGX_APIKEY_REQUEST_EXPIRED			-3
-#define NGX_APIKEY_INVALID_DIGEST			-4
-
 /*
  * Look for the client secret.
  *
@@ -541,33 +539,44 @@ ngx_apikey_mysql_fetch_client_secret( ngx_http_request_t *r, MYSQL *con, ngx_str
 }
 
 
-/*
+/**
+ * Create the expire_time string as unix epoch adding the specified minutes.
+ *
+ *  @params:	*pool			pool for allocating memory;
+ *				minutes_to_add	minute sto add to current time;
+ *				*expire_time	the string which will containt the calculated expire_time
+ *
+ * @return:		NGX_ERROR		on error;
+ *				NGX_OK			on success;
+ */
 static ngx_int_t
 ngx_apikey_token_expire_time( ngx_pool_t *pool, size_t minutes_to_add, ngx_str_t *expire_time ) {
-	uint8_t 	*last = NULL;
+	//struct tm 	*lc_tm = NULL;
 
-    struct tm 	*lc_tm = NULL;
+	uint8_t *last 	= NULL;
+	uint8_t *buffer = NULL;
+
+
 	time_t t;
-	uint8_t buffer[20];
-
-
     t = time(NULL);
 	t += ( 60 * minutes_to_add ); //.Aggiungo i minuti
-    
+/*
 	lc_tm = localtime( &t );
 	if ( lc_tm == NULL ) {
-        fprintf( stderr, "%s::failed allocating localtime\n", __func__ );
+        //fprintf( stderr, "%s::failed allocating localtime\n", __func__ );
         return NGX_ERROR;
     }
+*/
+ 
+	buffer = ngx_pcalloc(pool, NGX_INT_T_LEN + 1);
+	if (buffer == NULL) {
+		return NGX_ERROR;
+	}
 
-	expire_time->len = strftime((char*)buffer, sizeof(buffer), "%Y%m%d%H%M%S", lc_tm );
-	if ( expire_time->len == 0) {
-        fprintf(stderr, "%s::strftime returned 0\n", __func__ );
-        return NGX_ERROR;
-    }
-
-	if ( (expire_time->data = ngx_pcalloc(pool, expire_time->len + 1)) == NULL ) {
-    	fprintf( stderr, "%s::failed allocating memory\n", __func__ );
+	
+	expire_time->len = ngx_sprintf(buffer, "%ui", t) - buffer;
+	expire_time->data = ngx_pcalloc(pool, expire_time->len + 1);
+	if (expire_time->data == NULL) {
 		return NGX_ERROR;
 	}
 
@@ -576,7 +585,6 @@ ngx_apikey_token_expire_time( ngx_pool_t *pool, size_t minutes_to_add, ngx_str_t
 
 	return NGX_OK;
 }
-*/
 
 /**
  *	Verify the request token digest.
@@ -600,6 +608,8 @@ ngx_apikey_verify( ngx_http_request_t *r, ngx_str_t *client_id, ngx_str_t *issue
 	ngx_str_t	computed_digest		= ngx_null_string;
 	ngx_str_t	message				= ngx_null_string;
 	ngx_str_t	client_secret		= ngx_null_string;
+	ngx_str_t	expire_time			= ngx_null_string;
+
 
 	ngx_apikey_access_filter_loc_conf_t  *lcf = NULL;
 
@@ -613,6 +623,19 @@ ngx_apikey_verify( ngx_http_request_t *r, ngx_str_t *client_id, ngx_str_t *issue
 		return NGX_OK;
     }
 
+	
+	rc = ngx_apikey_token_expire_time(r->pool, lcf->expire_time, &expire_time);
+	if ( rc != NGX_OK ) {
+		return NGX_ERROR;	
+	}
+	ngx_log_debug( NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "expire time -->: %V", &expire_time );
+	
+	if ( ngx_strcmp(issued_time->data, expire_time.data) > 0 ) {
+		ngx_log_error( NGX_LOG_WARN, r->connection->log, 0, 
+			"token issued time <%V> expired <%V>", issued_time, &expire_time );
+		return NGX_ERROR;
+	}
+	
 	//.Init MySQL connection object.	
 	con = mysql_init( NULL );
 	if ( con == NULL ) {
