@@ -37,7 +37,7 @@ This module could be useful to anyone who develops backends APIs wich are consum
 
 Every time a client app call one of yours backend API, has to pass a token (named `X-AuthAPI`):
 
-    client_id|issued_time|HAMAC_SHA1(client_id|request_uri_path, client_secret)
+    client_id|issued_time|HAMAC_SHA1(issued_time|request_uri_path, client_secret)
 
 Where `client_id` and `client_secret` are strings generated as you desire. The `client_secret` will be kept safe in your own database.
 
