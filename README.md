@@ -105,8 +105,6 @@ Add the directives to your location in your nginx configuration file (see Synops
 TODO
 ====
 
- * Adding an `expire time` directive (so the API token will have an expiration time)
-
  * Replacing MySQL with Redis
 
 
